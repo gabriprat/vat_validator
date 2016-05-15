@@ -75,7 +75,7 @@ module ActiveModel
 
       def valid?
         if @country_code
-          VAT_PATTERNS.has_key?(@country_code) && @number.to_s =~ VAT_PATTERNS[@country_code]
+          !VAT_PATTERNS.has_key?(@country_code) || @number.to_s =~ VAT_PATTERNS[@country_code]
         else
           VAT_PATTERNS.values.detect { |p| @number.to_s =~ p }
         end
