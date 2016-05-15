@@ -44,11 +44,12 @@ module ActiveModel
         format_valid = true
 
         country_code = options[:country_method] ? record.send(options[:country_method]).to_s : nil
-        unless !country_code || value =~ /\A#{country_code}/ 
-          value = country_code + value
-        end
 
-        unless VatNumber.new(value, country_code).valid?
+        vat_number = VatNumber.new(value, country_code)
+
+        return unless vat_number.can_validate?
+
+        unless .valid?
           record.errors.add(attribute, options[:message])
           format_valid = false
         end
@@ -75,10 +76,14 @@ module ActiveModel
 
       def valid?
         if @country_code
-          !VAT_PATTERNS.has_key?(@country_code) || @number.to_s =~ VAT_PATTERNS[@country_code]
+          VAT_PATTERNS.has_key?(@country_code) && @number.to_s =~ VAT_PATTERNS[@country_code]
         else
           VAT_PATTERNS.values.detect { |p| @number.to_s =~ p }
         end
+      end
+
+      def can_validate?
+        VAT_PATTERNS.has_key?(@country_code)
       end
     end
   end
