@@ -16,17 +16,19 @@ module VatValidations
       country_code = complete_vat_number[0..1]
       vat_number   = complete_vat_number[2..15]
 
-      client = Savon.client(wsdl: vies_host)
+      client = Savon.client(wsdl: vies_host) do
+        convert_request_keys_to :lower_camelcase
+      end
 
       begin
-        response = client.request :check_vat do
-          soap.body = {
+        response = client.call :check_vat do
+          message(
             :country_code => country_code,
             :vat_number => vat_number
-          }
+          )
         end
 
-      rescue Savon::SOAP::Fault => fault
+      rescue Savon::SOAPFault => fault
         # https://github.com/rubiii/savon/blob/master/lib/savon/soap/fault.rb
         if fault.to_hash[:fault][:faultstring] == "{ 'INVALID_INPUT' }"
           if return_extra_infos
@@ -42,18 +44,18 @@ module VatValidations
           raise ViesContactError
         end
 
-      rescue
+      rescue RuntimeError => e
         raise ViesContactError
       end
 
       if response.success?
         if return_extra_infos
           {
-            :valid => response[:check_vat_response][:valid],
-            :name  => response[:check_vat_response][:name]
+            :valid => response.body[:check_vat_response][:valid],
+            :name  => response.body[:check_vat_response][:name]
           }
         else
-          return response[:check_vat_response][:valid]
+          return response.body[:check_vat_response][:valid]
         end
       else
         raise ViesContactError
