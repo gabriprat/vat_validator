@@ -49,7 +49,7 @@ module ActiveModel
 
         return unless vat_number.can_validate?
 
-        unless .valid?
+        unless vat_number.valid?
           record.errors.add(attribute, options[:message])
           format_valid = false
         end
