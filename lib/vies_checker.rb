@@ -16,7 +16,7 @@ module VatValidations
       country_code = complete_vat_number[0..1]
       vat_number   = complete_vat_number[2..15]
 
-      client = Savon::Client.new(vies_host)
+      client = Savon.client(wsdl: vies_host)
 
       begin
         response = client.request :check_vat do
