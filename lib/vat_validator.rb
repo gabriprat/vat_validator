@@ -43,6 +43,10 @@ module VatValidations
       format_valid = true
 
       country_code = options[:country_method] ? record.send(options[:country_method]).to_s : nil
+      unless !country_code || value =~ /\A#{country_code}/ 
+        value = country_code + value
+      end
+      
       unless VatNumber.new(value, country_code).valid?
         record.errors.add(attribute, options[:message])
         format_valid = false
