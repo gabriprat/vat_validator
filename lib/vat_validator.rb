@@ -48,7 +48,7 @@ module ActiveModel
         unless !country_code || value =~ /\A#{country_code}/
           value = country_code + value
         end
-        
+
         vat_number = VatNumber.new(value, country_code)
 
         return unless vat_number.can_validate?
@@ -60,9 +60,9 @@ module ActiveModel
 
         if format_valid && options[:vies]
           if options[:vies_host]
-            valid = ViesChecker.check(value, false, options[:vies_host])
+            valid = ::VatValidations::ViesChecker.check(value, false, options[:vies_host])
           else
-            valid = ViesChecker.check(value, false)
+            valid = ::VatValidations::ViesChecker.check(value, false)
           end
 
           unless valid
