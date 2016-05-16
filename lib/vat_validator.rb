@@ -48,6 +48,10 @@ module ActiveModel
         vat_number = VatNumber.new(value, country_code)
 
         return unless vat_number.can_validate?
+        
+        unless !country_code || value =~ /\A#{country_code}/
+          value = country_code + value
+        end
 
         unless vat_number.valid?
           record.errors.add(attribute, options[:message])
