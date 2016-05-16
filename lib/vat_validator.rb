@@ -45,13 +45,13 @@ module ActiveModel
 
         country_code = options[:country_method] ? record.send(options[:country_method]).to_s : nil
 
-        vat_number = VatNumber.new(value, country_code)
-
-        return unless vat_number.can_validate?
-        
         unless !country_code || value =~ /\A#{country_code}/
           value = country_code + value
         end
+        
+        vat_number = VatNumber.new(value, country_code)
+
+        return unless vat_number.can_validate?
 
         unless vat_number.valid?
           record.errors.add(attribute, options[:message])
